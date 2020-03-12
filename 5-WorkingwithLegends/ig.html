@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://js.arcgis.com/4.4"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css" />
+    <title>IGeometry-Head</title>
+  </head>
+  <body>
+    <select id="lstservices"></select>
+    <div id="mapView" style="width:700px; height:500px"></div>
+
+    <script>
+      let mapview;
+      let map;
+      let layer;
+
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/request",
+        "esri/layers/MapImageLayer",
+        "esri/widgets/Legend"
+      ], (Map, MapView, Request, MapLayer, Legend) => {
+        map = new Map({ basemap: "streets" });
+        let viewOptions = {
+          container: "mapView",
+          map: map,
+          zoom: 7,
+          center: [-69.97080547443983, 18.433231736483542],
+          scale: 1000000
+        };
+
+        mapview = new MapView(viewOptions);
+
+        let legend = new Legend({
+          view: mapview
+        });
+        mapview.ui.add(legend, "bottom-left");
+
+        //ADDING MAPSERVICES
+
+        let url = "https://server.arcgisonline.com/arcgis/rest/?f=json";
+        let options = { responseType: "json" };
+
+        Request(url, options).then(function(response) {
+          let result = response.data;
+          let lstservices = document.getElementById("lstservices");
+
+          lstservices.addEventListener("change", () => {
+            let selectedService =
+              lstservices.options[lstservices.selectedIndex].textContent;
+
+            layer = new MapLayer({
+              url: `https://server.arcgisonline.com/arcgis/rest/services/${selectedService}/MapServer`
+            });
+
+            map.removeAll();
+            map.add(layer);
+            layer.then(() => {
+              mapview.goTo(layer.fullExtent);
+            });
+          });
+
+          for (let i = 0; i < result.services.length; i++) {
+            let option = document.createElement("option");
+            option.textContent = result.services[i].name;
+            lstservices.appendChild(option);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
