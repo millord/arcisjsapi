@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.14/esri/css/main.css"
+    />
+    <script src="https://js.arcgis.com/4.14/"></script>
+
+    <title>arcgis web-mapping</title>
+  </head>
+  <body>
+    <button id="topoMap">Topographic map</button>
+    <button id="satelliteMap">Satellite map</button>
+    <div id="mapContainer" style="width: 500px; height: 500px;"></div>
+    <script>
+      let topoMap;
+      let satelliteMap;
+      let mapview;
+
+      require(["esri/Map", "esri/views/SceneView"], function(Map, ScenView) {
+        // CREATE THE MAP
+        topoMap = new Map({ basemap: "topo" });
+        satelliteMap = new Map({ basemap: "satellite" });
+        // CREATE THE MAPVIEW
+        mapview = new ScenView({
+          container: "mapContainer",
+          map: topoMap,
+          zoom: 11,
+          center: [-118.71511, 34.09042]
+        });
+      });
+      document.getElementById("topoMap").addEventListener("click", function() {
+        let lastLat = mapview.center.latitude;
+        let lastLng = mapview.center.longitude;
+        let lastZoom = mapview.zoom;
+        let p = new Promise(function(resolve, reject) {
+          mapview.map = topoMap;
+          resolve();
+        });
+        p.then(function() {
+          mapview.center = [lastLng, lastLat];
+          mapview.zoom = lastZoom;
+        });
+      });
+      document
+        .getElementById("satelliteMap")
+        .addEventListener("click", function() {
+          let lastLat = mapview.center.latitude;
+          let lastLng = mapview.center.longitude;
+          let lastZoom = mapview.zoom;
+          p = new Promise(function(resolve, reject) {
+            mapview.map = satelliteMap;
+            resolve();
+          });
+          p.then(function() {
+            mapview.center = [lastLng, lastLat];
+            mapview.zoom = lastZoom;
+          });
+        });
+    </script>
+  </body>
+</html>
