@@ -20,6 +20,24 @@
       let satelliteMap;
       let mapview;
 
+      let setBasemap = function(e) {
+        map.basemap = e.target.id;
+      };
+      for (let i = 0; i < basemaps.length; i++) {
+        // get the buttons
+        let buttons = document.getElementById("buttons");
+        // create a button on memory
+        let button = document.createElement("button");
+        // get the id
+        button.id = basemap[i];
+        //get the text content
+        button.textContent = basemaps[i];
+        // add event listener
+        button.addEventListener("click", setBasemap);
+        // insert the button inside the div
+        buttons.appendChild(button);
+      }
+
       require(["esri/Map", "esri/views/SceneView"], function(Map, ScenView) {
         // CREATE THE MAP
         topoMap = new Map({ basemap: "topo" });
